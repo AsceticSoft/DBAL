@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace AsceticSoft\DBAL\Driver;
 
-use AsceticSoft\DBAL\EventDispatcherAwareTrait;
 use PDO;
 use Psr\Log\LoggerAwareTrait;
 
 abstract class AbstractDriver implements DriverInterface
 {
     use LoggerAwareTrait;
-    use EventDispatcherAwareTrait;
 
     public function createPdoInstance(
         string $dsn,

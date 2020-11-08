@@ -7,13 +7,11 @@ namespace AsceticSoft\DBAL;
 use AsceticSoft\DBAL\Driver\SavepointInterface;
 use AsceticSoft\DBAL\Event\TransactionEvent;
 use AsceticSoft\DBAL\PdoCommand\DbException;
-use Psr\Log\LoggerAwareTrait;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
 
-class Transaction implements EventDispatcherAwareInterface
+class Transaction
 {
-    use EventDispatcherAwareTrait;
-    use LoggerAwareTrait;
-
     /**
      * A constant representing the transaction isolation level `READ UNCOMMITTED`.
      *
@@ -45,10 +43,17 @@ class Transaction implements EventDispatcherAwareInterface
     private int $level = 0;
 
     private Connection $connection;
+    private ?LoggerInterface $logger;
+    private ?EventDispatcherInterface $eventDispatcher;
 
-    public function __construct(Connection $connection)
-    {
+    public function __construct(
+        Connection $connection,
+        ?LoggerInterface $logger = null,
+        ?EventDispatcherInterface $eventDispatcher = null
+    ) {
         $this->connection = $connection;
+        $this->logger = $logger;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**

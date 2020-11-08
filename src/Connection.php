@@ -8,15 +8,16 @@ use AsceticSoft\DBAL\Driver\DriverFactory;
 use AsceticSoft\DBAL\Driver\DriverInterface;
 use AsceticSoft\DBAL\Event\ConnectionEvent;
 use PDO;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use AsceticSoft\DBAL\PdoCommand\Statement;
 use AsceticSoft\DBAL\PdoCommand\DbException;
 use AsceticSoft\DBAL\PdoCommand\Fetch\Fetch;
 
-class Connection
+class Connection implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
-    use EventDispatcherAwareTrait;
 
     private string $dsn;
     private ?string $username;
@@ -25,7 +26,7 @@ class Connection
     private DriverInterface $driver;
     private ?Transaction $transaction = null;
     private ?PDO $pdo = null;
-
+    private ?EventDispatcherInterface $eventDispatcher = null;
     /**
      * Connection constructor.
      *
@@ -40,6 +41,13 @@ class Connection
         $this->driver = (new DriverFactory())($dsn);
     }
 
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher): self
+    {
+        $this->eventDispatcher = $eventDispatcher;
+
+        return $this;
+    }
+
     /**
      * Sets the isolation level of the current transaction.
      *
@@ -49,9 +57,11 @@ class Connection
      * @see Transaction::SERIALIZABLE
      * @see http://en.wikipedia.org/wiki/Isolation_%28database_systems%29#Isolation_levels
      */
-    public function setTransactionIsolationLevel(string $isolationLevel): void
+    public function setTransactionIsolationLevel(string $isolationLevel): self
     {
         $this->driver->setTransactionIsolationLevel($this->getPdo(), $isolationLevel);
+
+        return $this;
     }
 
     /**
@@ -65,9 +75,7 @@ class Connection
     public function beginTransaction(string $isolationLevel = null): Transaction
     {
         if (null === $this->transaction) {
-            $this->transaction = new Transaction($this);
-            $this->logger && $this->transaction->setLogger($this->logger);
-            $this->eventDispatcher && $this->transaction->setEventDispatcher($this->eventDispatcher);
+            $this->transaction = new Transaction($this, $this->logger, $this->eventDispatcher);
         }
 
         return $this->transaction->begin($isolationLevel);

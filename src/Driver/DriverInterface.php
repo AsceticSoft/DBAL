@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace AsceticSoft\DBAL\Driver;
 
-use AsceticSoft\DBAL\EventDispatcherAwareInterface;
 use PDO;
-use Psr\Log\LoggerAwareInterface;
 
-interface DriverInterface extends LoggerAwareInterface, EventDispatcherAwareInterface
+interface DriverInterface
 {
     public function createPdoInstance(
         string $dsn,
