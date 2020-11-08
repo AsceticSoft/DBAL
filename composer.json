@@ -1,0 +1,40 @@
+{
+    "name": "asceticsoft/dbal",
+    "description": "Fast ORM",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Andrey Borodulin",
+            "email": "borodulin@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^7.4",
+        "ext-pdo": "*",
+        "psr/cache": "^1.0",
+        "psr/container": "^1.0",
+        "psr/event-dispatcher": "^1.0",
+        "psr/log": "^1.1",
+        "php-ds/php-ds": "^1.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.1",
+        "phpstan/phpstan": "^0.11.15",
+        "php-coveralls/php-coveralls": "^2.1",
+        "friendsofphp/php-cs-fixer": "^2.15",
+        "phpunit/phpcov": "^7.0",
+        "phpmd/phpmd": "^2.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "AsceticSoft\\DBAL\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "AsceticSoft\\DBAL\\Tests\\": "tests/"
+        }
+    }
+}

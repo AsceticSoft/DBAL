@@ -1,0 +1,32 @@
+#dist: bionic
+language: php
+
+php:
+  - '7.4'
+
+services:
+  - postgresql
+  - mysql
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+    - vendor
+
+install:
+  - composer install --no-interaction
+
+before_script:
+  - mkdir -p build/logs
+  - psql -c 'create database chinook;' -U postgres
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS chinook;'
+
+script:
+  - vendor/bin/php-cs-fixer fix --config=.php_cs.dist -v --dry-run --stop-on-violation --using-cache=no
+  - vendor/bin/phpstan analyse ./src/
+  - vendor/bin/phpunit -c phpunit.sqlite.xml --coverage-php build/logs/sqlite.cov
+  - vendor/bin/phpunit -c phpunit.mysql.xml --coverage-php build/logs/mysql.cov
+  - vendor/bin/phpunit -c phpunit.pgsql.xml --coverage-php build/logs/pgsql.cov
+after_success:
+  - vendor/bin/phpcov merge build/logs --clover build/logs/clover.xml;
+  - then vendor/bin/php-coveralls --no-interaction;
