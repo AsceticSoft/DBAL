@@ -97,14 +97,10 @@ class Transaction
             if (null !== $isolationLevel) {
                 $driver->setTransactionIsolationLevel($pdo, $isolationLevel);
             }
-            if ($this->logger) {
-                $this->logger->debug(
-                    'Begin transaction'.($isolationLevel ? ' with isolation level '.$isolationLevel : '')
-                );
-            }
-            if ($this->eventDispatcher) {
-                $this->eventDispatcher->dispatch(new TransactionEvent($this, TransactionEvent::EVENT_BEGIN));
-            }
+            $this->logger?->debug(
+                'Begin transaction'.($isolationLevel ? ' with isolation level '.$isolationLevel : '')
+            );
+            $this->eventDispatcher?->dispatch(new TransactionEvent($this, TransactionEvent::EVENT_BEGIN));
             $pdo->beginTransaction();
             $this->level = 1;
 
@@ -112,16 +108,12 @@ class Transaction
         }
 
         if ($driver instanceof SavepointInterface) {
-            if ($this->logger) {
-                $this->logger->debug('Set savepoint '.$this->level);
-            }
+            $this->logger?->debug('Set savepoint '.$this->level);
             $driver->createSavepoint($pdo, 'LEVEL'.$this->level);
         } else {
-            if ($this->logger) {
-                $this->logger->critical(
-                    'Transaction not started: nested transaction not supported'
-                );
-            }
+            $this->logger?->critical(
+                'Transaction not started: nested transaction not supported'
+            );
             throw new NotSupportedException('Transaction not started: nested transaction not supported.');
         }
         ++$this->level;
@@ -142,29 +134,21 @@ class Transaction
         $pdo = $this->connection->getPdo();
         --$this->level;
         if (0 === $this->level) {
-            if ($this->logger) {
-                $this->logger->debug('Commit transaction');
-            }
+            $this->logger?->debug('Commit transaction');
             $pdo->commit();
-            if ($this->eventDispatcher) {
-                $this->eventDispatcher->dispatch(
-                    new TransactionEvent($this, TransactionEvent::EVENT_COMMIT)
-                );
-            }
+            $this->eventDispatcher?->dispatch(
+                new TransactionEvent($this, TransactionEvent::EVENT_COMMIT)
+            );
 
             return $this;
         }
 
         $driver = $this->connection->getDriver();
         if ($driver instanceof SavepointInterface) {
-            if ($this->logger) {
-                $this->logger->debug('Release savepoint '.$this->level);
-            }
+            $this->logger?->debug('Release savepoint '.$this->level);
             $driver->releaseSavepoint($pdo, 'LEVEL'.$this->level);
         } else {
-            if ($this->logger) {
-                $this->logger->critical('Transaction not committed: nested transaction not supported');
-            }
+            $this->logger?->critical('Transaction not committed: nested transaction not supported');
             throw new NotSupportedException('Transaction not committed: nested transaction not supported.');
         }
 
@@ -184,28 +168,20 @@ class Transaction
         $pdo = $this->connection->getPdo();
         --$this->level;
         if (0 === $this->level) {
-            if ($this->logger) {
-                $this->logger->debug('Roll back transaction');
-            }
+            $this->logger?->debug('Roll back transaction');
             $pdo->rollBack();
-            if ($this->eventDispatcher) {
-                $this->eventDispatcher->dispatch(
-                    new TransactionEvent($this, TransactionEvent::EVENT_ROLLBACK)
-                );
-            }
+            $this->eventDispatcher?->dispatch(
+                new TransactionEvent($this, TransactionEvent::EVENT_ROLLBACK)
+            );
 
             return $this;
         }
         $driver = $this->connection->getDriver();
         if ($driver instanceof SavepointInterface) {
-            if ($this->logger) {
-                $this->logger->debug('Roll back to savepoint '.$this->level);
-            }
+            $this->logger?->debug('Roll back to savepoint '.$this->level);
             $driver->rollBackSavepoint($pdo, 'LEVEL'.$this->level);
         } else {
-            if ($this->logger) {
-                $this->logger->info('Transaction not rolled back: nested transaction not supported');
-            }
+            $this->logger?->info('Transaction not rolled back: nested transaction not supported');
         }
 
         return $this;
@@ -231,9 +207,7 @@ class Transaction
         if (!$this->isActive()) {
             throw new DbException('Failed to set isolation level: transaction was inactive.');
         }
-        if ($this->logger) {
-            $this->logger->debug('Setting transaction isolation level to '.$level);
-        }
+        $this->logger?->debug('Setting transaction isolation level to '.$level);
         $this->connection->setTransactionIsolationLevel($level);
 
         return $this;

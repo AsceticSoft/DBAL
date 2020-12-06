@@ -41,10 +41,10 @@ class Fetch
      * Executes the SQL statement and returns the value of the first column in the first row of data.
      * This method is best used when only a single value is needed for a query.
      *
-     * @return string|false|null the value of the first column in the first row of the query result.
-     *                           False is returned if there is no value.
+     * the value of the first column in the first row of the query result.
+     * False is returned if there is no value.
      */
-    public function scalar(int $columnNumber = 0)
+    public function scalar(int $columnNumber = 0): string|false|null
     {
         $result = $this->statement->fetchColumn($columnNumber);
         if (\is_resource($result) && 'stream' === get_resource_type($result)) {
@@ -57,7 +57,7 @@ class Fetch
 
     public function exists(): bool
     {
-        return (bool) $this->scalar(0);
+        return (bool) $this->scalar();
     }
 
     /**

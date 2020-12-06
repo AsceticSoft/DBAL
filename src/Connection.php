@@ -95,9 +95,7 @@ class Connection implements LoggerAwareInterface
                 $this->password,
                 $this->options
             );
-            if ($this->eventDispatcher) {
-                $this->eventDispatcher->dispatch(new ConnectionEvent($this, ConnectionEvent::EVENT_AFTER_OPEN));
-            }
+            $this->eventDispatcher?->dispatch(new ConnectionEvent($this, ConnectionEvent::EVENT_AFTER_OPEN));
         }
 
         return $this->pdo;

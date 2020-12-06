@@ -11,21 +11,16 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "php": "^7.4",
+        "php": "^8.0",
         "ext-pdo": "*",
         "psr/cache": "^1.0",
         "psr/container": "^1.0",
         "psr/event-dispatcher": "^1.0",
-        "psr/log": "^1.1",
-        "php-ds/php-ds": "^1.2"
+        "psr/log": "^1.1"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.1",
-        "phpstan/phpstan": "^0.11.15",
-        "php-coveralls/php-coveralls": "^2.1",
-        "friendsofphp/php-cs-fixer": "^2.15",
-        "phpunit/phpcov": "^7.0",
-        "phpmd/phpmd": "^2.8"
+        "phpunit/phpunit": "^9.5",
+        "phpstan/phpstan": "^0.12.58"
     },
     "autoload": {
         "psr-4": {
